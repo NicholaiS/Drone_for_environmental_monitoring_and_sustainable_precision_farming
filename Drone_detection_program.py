@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 loadColor = False
 
 # Reading the image and resizing:
-img = cv2.resize(cv2.imread("Drone pics\\Outdoor test 1\\img_7.jpg"), (1080, 720))
+img = cv2.resize(cv2.imread("Drone pics\\Outdoor test 1\\img_9.jpg"), (1080, 720))
 height, width = img.shape[:2]
 pixels = np.reshape(img, (-1, 3))
 
