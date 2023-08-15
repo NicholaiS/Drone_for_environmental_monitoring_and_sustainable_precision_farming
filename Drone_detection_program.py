@@ -7,14 +7,14 @@ import matplotlib.pyplot as plt
 loadColor = False
 
 # Reading the image and resizing:
-img = cv2.resize(cv2.imread("Drone pics\\3.jpg"), (1080, 720))
+img = cv2.resize(cv2.imread("Drone pics\\Outdoor test 1\\img_7.jpg"), (1080, 720))
 height, width = img.shape[:2]
 pixels = np.reshape(img, (-1, 3))
 
 def find_avg_and_cov():
     # Finding the mean of the color and the covariance:
-    img_annotated = cv2.resize(cv2.imread('Drone pics\\7_rod.jpg'), (1080, 720))
-    mask = cv2.inRange(img_annotated, (30, 45, 230), (40, 55, 235))
+    img_annotated = cv2.resize(cv2.imread('Drone pics\\Outdoor test 1\\img_9_rod.jpg'), (1080, 720))
+    mask = cv2.inRange(img_annotated, (0, 0, 245), (10, 10, 255))
     mask_pixels = np.reshape(mask, (-1))
     cv2.imshow("Mask Image", mask)
     cv2.waitKey(0)
@@ -44,7 +44,7 @@ def find_avg_and_cov():
 if loadColor:
    find_avg_and_cov()
 
-# Using Mahalanobis distance using the mean and covariance:
+# Finding Mahalanobis distance using the mean and covariance:
 # Load avg and cov from the text file
 loaded_data = np.loadtxt("avg_cov.txt")
 loaded_avg = loaded_data[:3]
@@ -62,12 +62,11 @@ mahalanobis_dist = np.sum(moddotproduct, axis=1)
 mahalanobis_distance_image = np.reshape(mahalanobis_dist, (img.shape[0], img.shape[1]))
 
 # Scale the distance image and export it.
-mahalanobis_distance_image = 255 * mahalanobis_distance_image / np.max(mahalanobis_distance_image)
+# mahalanobis_distance_image = 255 * mahalanobis_distance_image / np.max(mahalanobis_distance_image)
 cv2.imshow("Mahalanobis Distance Image", mahalanobis_distance_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 cv2.imwrite("Pics out/mahalanobis_dist_image.jpg", mahalanobis_distance_image)
-
 
 # ------------------------------------------- Feature Extraction ---------------------------------------------
 imgfe = cv2.imread("Pics out/mahalanobis_dist_image.jpg")
@@ -96,10 +95,20 @@ for contour in contours:
         
         # Draw centroid on the image
         cv2.circle(imgfe, centroid, 5, (0, 0, 255), -1)
+        
+        # Calculate Hu Moments
+        hu_moments = cv2.HuMoments(moments)
+        print("Hu Moments:", hu_moments.flatten())
     
     # Calculate other moments and properties if needed
     # For example: area, orientation, eccentricity, etc.
     
+
+# TO DO:
+# Normalization af data.
+# evt flere moments.
+# Classifier.
+
 cv2.imshow("Contour Image with Centroids", imgfe)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
