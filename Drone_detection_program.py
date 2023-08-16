@@ -62,46 +62,52 @@ mahalanobis_dist = np.sum(moddotproduct, axis=1)
 mahalanobis_distance_image = np.reshape(mahalanobis_dist, (img.shape[0], img.shape[1]))
 
 # Scale the distance image and export it.
-# mahalanobis_distance_image = 255 * mahalanobis_distance_image / np.max(mahalanobis_distance_image)
+mahalanobis_distance_image_scaled = 255 * mahalanobis_distance_image / np.max(mahalanobis_distance_image)
 cv2.imshow("Mahalanobis Distance Image", mahalanobis_distance_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 cv2.imwrite("Pics out/mahalanobis_dist_image.jpg", mahalanobis_distance_image)
+cv2.imwrite("Pics out/mahalanobis_dist_image_scaled.jpg", mahalanobis_distance_image_scaled)
 
 # ------------------------------------------- Feature Extraction ---------------------------------------------
-imgfe = cv2.imread("Pics out/mahalanobis_dist_image.jpg")
-imgfeGray = cv2.cvtColor(imgfe, cv2.COLOR_BGR2GRAY)
+img_maha = cv2.imread("Pics out/mahalanobis_dist_image.jpg")
+img_maha_scaled = cv2.imread("Pics out/mahalanobis_dist_image_scaled.jpg")
+imgfeGray = cv2.cvtColor(img_maha, cv2.COLOR_BGR2GRAY)
 tLower = 50
 tUpper = 250
 imgCanny = cv2.Canny(imgfeGray, tLower, tUpper)
 
 contours, hierarchy = cv2.findContours(imgCanny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-cv2.drawContours(imgfe, contours, -1, (0, 255, 0), 2)
+cv2.drawContours(img_maha_scaled, contours, -1, (0, 255, 0), 2)
 
-cv2.imshow("Contour Image", imgfe)
+cv2.imshow("Contour Image", img_maha_scaled)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
 for contour in contours:
-    # Calculate moments for each contour
-    moments = cv2.moments(contour)
-
-    drawing = 0 * imgfeGray
-    # Calculate centroid
-    if moments['m00'] != 0:  # Avoid division by zero
-        cX = int(moments['m10'] / moments['m00'])
-        cY = int(moments['m01'] / moments['m00'])
-        centroid = (cX, cY)
-        
-        # Draw centroid on the image
-        cv2.circle(imgfe, centroid, 5, (0, 0, 255), -1)
-        
-        # Calculate Hu Moments
-        hu_moments = cv2.HuMoments(moments)
-        print("Hu Moments:", hu_moments.flatten())
+    # Calculate circularity
+    area = cv2.contourArea(contour)
+    perimeter = cv2.arcLength(contour, True)
+    if perimeter > 0: circularity = (4 * np.pi * area) / (perimeter ** 2)
+    print("Circularity:", circularity)
     
-    # Calculate other moments and properties if needed
-    # For example: area, orientation, eccentricity, etc.
+    if circularity > 0.8:
+        # Calculate moments for contour
+        moments = cv2.moments(contour)
+
+        drawing = 0 * imgfeGray
+        # Calculate centroid
+        if moments['m00'] != 0:  # Avoid division by zero
+            cX = int(moments['m10'] / moments['m00'])
+            cY = int(moments['m01'] / moments['m00'])
+            centroid = (cX, cY)
+        
+            # Draw centroid on the image
+            cv2.circle(img_maha_scaled, centroid, 5, (0, 0, 255), -1)
+        
+            # Calculate Hu Moments
+            hu_moments = cv2.HuMoments(moments)
+            print("Hu Moments:", hu_moments.flatten())
     
 
 # TO DO:
@@ -109,6 +115,6 @@ for contour in contours:
 # evt flere moments.
 # Classifier.
 
-cv2.imshow("Contour Image with Centroids", imgfe)
+cv2.imshow("Contour Image with Centroids", img_maha_scaled)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
