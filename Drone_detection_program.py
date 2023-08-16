@@ -7,9 +7,12 @@ import matplotlib.pyplot as plt
 loadColor = False
 
 # Reading the image and resizing:
-img = cv2.resize(cv2.imread("Drone pics\\Outdoor test 1\\img_9.jpg"), (1080, 720))
+img = cv2.resize(cv2.imread("Drone pics\\Outdoor test 1\\img_0.jpg"), (1080, 720))
 height, width = img.shape[:2]
 pixels = np.reshape(img, (-1, 3))
+cv2.imshow("Original image", img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 
 def find_avg_and_cov():
     # Finding the mean of the color and the covariance:
@@ -104,16 +107,14 @@ for contour in contours:
         
             # Draw centroid on the image
             cv2.circle(img_maha_scaled, centroid, 5, (0, 0, 255), -1)
-        
+
+            """
             # Calculate Hu Moments
             hu_moments = cv2.HuMoments(moments)
             print("Hu Moments:", hu_moments.flatten())
+            """
     
 
-# TO DO:
-# Normalization af data.
-# evt flere moments.
-# Classifier.
 
 cv2.imshow("Contour Image with Centroids", img_maha_scaled)
 cv2.waitKey(0)
