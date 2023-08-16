@@ -6,6 +6,11 @@ import matplotlib.pyplot as plt
 
 loadColor = False
 
+image_number = 0
+
+# Der skal logges Hu Moments og andet relevant information, så vi kan se om det er andet vi kan bruge...
+folder = 'Info logs\\'
+
 # Reading the image and resizing:
 img = cv2.resize(cv2.imread("Drone pics\\Outdoor test 1\\img_0.jpg"), (1080, 720))
 height, width = img.shape[:2]
@@ -86,33 +91,30 @@ cv2.drawContours(img_maha_scaled, contours, -1, (0, 255, 0), 2)
 cv2.imshow("Contour Image", img_maha_scaled)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
-
-for contour in contours:
-    # Calculate circularity
-    area = cv2.contourArea(contour)
-    perimeter = cv2.arcLength(contour, True)
-    if perimeter > 0: circularity = (4 * np.pi * area) / (perimeter ** 2)
-    print("Circularity:", circularity)
+with open(folder + "img_" + str(i) + ".txt", 'w') as f:
+    for contour in contours:
+        # Calculate circularity
+        area = cv2.contourArea(contour)
+        perimeter = cv2.arcLength(contour, True)
+        if perimeter > 0: circularity = (4 * np.pi * area) / (perimeter ** 2)
+        print("Circularity:", circularity)
     
-    if circularity > 0.8:
-        # Calculate moments for contour
-        moments = cv2.moments(contour)
+        if circularity > 0.8:
+            # Calculate moments for contour
+            moments = cv2.moments(contour)
 
-        drawing = 0 * imgfeGray
-        # Calculate centroid
-        if moments['m00'] != 0:  # Avoid division by zero
-            cX = int(moments['m10'] / moments['m00'])
-            cY = int(moments['m01'] / moments['m00'])
-            centroid = (cX, cY)
+            # Calculate centroid
+            if moments['m00'] != 0:  # Avoid division by zero
+                cX = int(moments['m10'] / moments['m00'])
+                cY = int(moments['m01'] / moments['m00'])
+                centroid = (cX, cY)
         
-            # Draw centroid on the image
-            cv2.circle(img_maha_scaled, centroid, 5, (0, 0, 255), -1)
+                # Draw centroid on the image
+                cv2.circle(img_maha_scaled, centroid, 5, (0, 0, 255), -1)
 
-            """
-            # Calculate Hu Moments
-            hu_moments = cv2.HuMoments(moments)
-            print("Hu Moments:", hu_moments.flatten())
-            """
+                # Calculate Hu Moments
+                hu_moments = cv2.HuMoments(moments)
+                print("Hu Moments:", hu_moments.flatten())
     
 
 

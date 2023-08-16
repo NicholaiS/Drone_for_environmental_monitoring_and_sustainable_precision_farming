@@ -4,8 +4,8 @@ import numpy as np
 import platform
 import os
 
-pic_amount = 32
-CIRCULARITY = 0.75
+pic_amount = 23
+CIRCULARITY = 0.80
 
 folder = 'Bounding boxes out\\' + str(CIRCULARITY) + "\\"
 if not os.path.exists(folder):
@@ -80,7 +80,7 @@ for i in range(pic_amount):
                     bottom_right = (int(cX + estimated_radius), int(cY + estimated_radius))
         
                     # Draw the bounding square
-                    bounding_square_color = (255, 0, 0)  # BGR color for the square (red)
+                    bounding_square_color = (0, 0, 255)  # BGR color for the square (red)
                     img_maha_scaled = cv2.rectangle(img_maha_scaled, top_left, bottom_right, bounding_square_color, 1)
                     f.write(f"{top_left} {bottom_right}\n")    
 
