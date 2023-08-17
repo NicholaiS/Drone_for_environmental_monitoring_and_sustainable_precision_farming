@@ -7,6 +7,8 @@ import os
 loadColor = False
 
 image_number = 0
+CIRCULARITY = 0.8
+AREA = 80
 MASK = 'best'
 
 # Der skal logges Hu Moments og andet relevant information, s� vi kan se om det er andet vi kan bruge...
@@ -98,7 +100,7 @@ with open(folder + "img_" + str(image_number) + ".txt", 'w') as f:
         if perimeter > 0: circularity = (4 * np.pi * area) / (perimeter ** 2)
         print("Circularity:", circularity)
     
-        if circularity > 0.75 and area > 80:
+        if circularity > CIRCULARITY and area > AREA:
             # Calculate moments for contour
             moments = cv2.moments(contour)
 

@@ -1,0 +1,26 @@
+<annotation>
+	<folder>pots_new</folder>
+	<filename>img_4.jpg</filename>
+	<path>C:\Users\Bruger\Desktop\pots_new\img_4.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1080</width>
+		<height>720</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>pot</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>554</xmin>
+			<ymin>454</ymin>
+			<xmax>565</xmax>
+			<ymax>465</ymax>
+		</bndbox>
+	</object>
+</annotation>

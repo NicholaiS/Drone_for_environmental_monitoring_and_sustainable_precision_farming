@@ -5,9 +5,10 @@ import platform
 import os
 
 pic_amount = 20
-CIRCULARITY = 0.75
+CIRCULARITY = 0.80
+AREA = 80
 
-folder = 'Bounding boxes out\\' + str(CIRCULARITY) + "\\"
+folder = 'Bounding boxes out\\' + str(AREA) + "\\" + str(CIRCULARITY) + "\\"
 if not os.path.exists(folder):
     os.makedirs(folder)
 
@@ -61,7 +62,7 @@ for i in range(pic_amount):
             if perimeter > 0: circularity = (4 * np.pi * area) / (perimeter ** 2)
             print("Circularity:", circularity)
     
-            if circularity > CIRCULARITY and area > 80:
+            if circularity > CIRCULARITY and area > AREA:
                 # Calculate moments for contour
                 moments = cv2.moments(contour)
 

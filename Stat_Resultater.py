@@ -91,8 +91,8 @@ def load_ground_truth(gt_dir):
             gt_boxes[filename[:-4]] = boxes
     return gt_boxes
 
-# load predictions for a given threshold
-def load_predictions(pred_dir, threshold):
+# load bounding box coordinates from a .txt file
+def load_predictions(pred_dir):
     preds = {}
     for filename in os.listdir(pred_dir):
         if filename.endswith('.txt'):
@@ -100,14 +100,18 @@ def load_predictions(pred_dir, threshold):
             with open(os.path.join(pred_dir, filename), 'r') as f:
                 lines = f.readlines()
             boxes = []
+            coords = []
             for line in lines:
-                values = line.strip().split()
-                if float(values[1]) >= threshold:
-                    xmin = int(float(values[2]))
-                    ymin = int(float(values[3]))
-                    xmax = int(float(values[4]))
-                    ymax = int(float(values[5]))
-                    boxes.append([xmin, ymin, xmax, ymax])
+                coords_pairs = line.strip().split(') (')
+                coord = coords_pairs[0].replace('(', '').replace(')', '').split(', ')
+                coords.append(coord)
+                coord = coords_pairs[1].replace('(', '').replace(')', '').split(', ')
+                coords.append(coord)
+                    
+                if len(coords) == 2:
+                    tl_x, tl_y = map(int, coords[0])  # Access sublist directly
+                    br_x, br_y = map(int, coords[1])  # Access sublist directly
+                    boxes.append([tl_x, tl_y, br_x, br_y])
             preds[image_id] = boxes
     return preds
 
@@ -119,9 +123,9 @@ def calculate_ap(precision, recall):
     return auc
 
 # calculate precision-recall curve
-gt_dir = 'C:\\Users\\Nicho\\source\\repos\\Stat_Resultater\\Stat_Resultater\\Ground thruths'
-pred_dir = 'C:\\Users\\Nicho\\source\\repos\\Stat_Resultater\\Stat_Resultater\\Predictions'
-thresholds = [0.70, 0.65, 0.60, 0.55, 0.50, 0.45, 0.40, 0.35, 0.30, 0.25, 0.20]
+gt_dir = 'Ground thruths'
+pred_dir = 'Bounding boxes out\\80'
+thresholds = [0.75, 0.70, 0.65, 0.60, 0.55, 0.50, 0.45, 0.40, 0.35, 0.30, 0.25]
 
 # load ground truth boxes
 gt_boxes = load_ground_truth(gt_dir)
@@ -135,7 +139,8 @@ data_log = open("data log.txt", "w")
 # loop over all thresholds
 for threshold in thresholds:
     # load predicted boxes for the current threshold
-    pred_boxes = load_predictions(os.path.join(pred_dir, str(threshold)), threshold)
+    pred_boxes = load_predictions(os.path.join(pred_dir, str(threshold)))
+    print(pred_boxes)
 
     # initialize variables to keep track of true positives, false positives, and false negatives
     tp = 0
