@@ -6,8 +6,8 @@ import os
 
 loadColor = False
 
-image_number = 0
-CIRCULARITY = 0.8
+image_number = 1
+CIRCULARITY = 0.75
 AREA = 80
 MASK = 'best'
 
@@ -83,14 +83,24 @@ cv2.imwrite("Pics out/mahalanobis_dist_image_scaled.jpg", mahalanobis_distance_i
 
 # ------------------------------------------- Feature Extraction ---------------------------------------------
 img_maha = cv2.imread("Pics out/mahalanobis_dist_image.jpg")
+cv2.imshow("Mahalanobis Distance Image", img_maha)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
 img_maha_scaled = cv2.imread("Pics out/mahalanobis_dist_image_scaled.jpg")
 imgfeGray = cv2.cvtColor(img_maha, cv2.COLOR_BGR2GRAY)
+cv2.imshow("Mahalanobis Distance Scaled Image", img_maha_scaled)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 tLower = 50
 tUpper = 250
 imgCanny = cv2.Canny(imgfeGray, tLower, tUpper)
 
 contours, hierarchy = cv2.findContours(imgCanny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 cv2.drawContours(img_maha_scaled, contours, -1, (0, 255, 0), 2)
+cv2.imshow("MD Scaled with Centroids", img_maha_scaled)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 
 with open(folder + "img_" + str(image_number) + ".txt", 'w') as f:
     for contour in contours:

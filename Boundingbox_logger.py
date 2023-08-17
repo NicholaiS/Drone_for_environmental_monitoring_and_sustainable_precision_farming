@@ -5,8 +5,8 @@ import platform
 import os
 
 pic_amount = 20
-CIRCULARITY = 0.80
-AREA = 80
+CIRCULARITY = 0.70
+AREA = 40
 
 folder = 'Bounding boxes out\\' + str(AREA) + "\\" + str(CIRCULARITY) + "\\"
 if not os.path.exists(folder):
