@@ -4,8 +4,8 @@ import numpy as np
 import platform
 import os
 
-pic_amount = 23
-CIRCULARITY = 0.80
+pic_amount = 20
+CIRCULARITY = 0.75
 
 folder = 'Bounding boxes out\\' + str(CIRCULARITY) + "\\"
 if not os.path.exists(folder):
@@ -21,7 +21,7 @@ for i in range(pic_amount):
 
     # Finding Mahalanobis distance using the mean and covariance:
     # Load avg and cov from the text file
-    loaded_data = np.loadtxt("avg_cov.txt")
+    loaded_data = np.loadtxt("avg_cov_img_best.txt")
     loaded_avg = loaded_data[:3]
     loaded_cov = loaded_data[3:].reshape(3, 3)
 
@@ -61,7 +61,7 @@ for i in range(pic_amount):
             if perimeter > 0: circularity = (4 * np.pi * area) / (perimeter ** 2)
             print("Circularity:", circularity)
     
-            if circularity > CIRCULARITY:
+            if circularity > CIRCULARITY and area > 80:
                 # Calculate moments for contour
                 moments = cv2.moments(contour)
 

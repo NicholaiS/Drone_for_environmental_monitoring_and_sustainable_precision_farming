@@ -1,18 +1,21 @@
 from pickle import FALSE
 import cv2
 import numpy as np
-import random
-import matplotlib.pyplot as plt
+import platform
+import os
 
 loadColor = False
 
 image_number = 0
+MASK = 'best'
 
-# Der skal logges Hu Moments og andet relevant information, så vi kan se om det er andet vi kan bruge...
+# Der skal logges Hu Moments og andet relevant information, sï¿½ vi kan se om det er andet vi kan bruge...
 folder = 'Info logs\\'
+if not os.path.exists(folder):
+    os.makedirs(folder)
 
 # Reading the image and resizing:
-img = cv2.resize(cv2.imread("Drone pics\\Outdoor test 1\\img_0.jpg"), (1080, 720))
+img = cv2.resize(cv2.imread("Drone pics\\Outdoor test 1\\img_" + str(image_number) + ".jpg"), (1080, 720))
 height, width = img.shape[:2]
 pixels = np.reshape(img, (-1, 3))
 cv2.imshow("Original image", img)
@@ -21,7 +24,7 @@ cv2.destroyAllWindows()
 
 def find_avg_and_cov():
     # Finding the mean of the color and the covariance:
-    img_annotated = cv2.resize(cv2.imread('Drone pics\\Outdoor test 1\\img_9_rod.jpg'), (1080, 720))
+    img_annotated = cv2.resize(cv2.imread("Drone pics\\Outdoor test 1\\img_" + str(image_number) + "_rod.jpg"), (1080, 720))
     mask = cv2.inRange(img_annotated, (0, 0, 245), (10, 10, 255))
     mask_pixels = np.reshape(mask, (-1))
     cv2.imshow("Mask Image", mask)
@@ -45,7 +48,7 @@ def find_avg_and_cov():
     print(cov)
 
     # Save avg and cov to a text file
-    np.savetxt("avg_cov.txt", np.concatenate((avg, cov.flatten())))
+    np.savetxt("avg_cov_img_" + str(image_number) + ".txt", np.concatenate((avg, cov.flatten())))
 
 # ------------------------------------------- Color segmentation ---------------------------------------------
 
@@ -54,7 +57,7 @@ if loadColor:
 
 # Finding Mahalanobis distance using the mean and covariance:
 # Load avg and cov from the text file
-loaded_data = np.loadtxt("avg_cov.txt")
+loaded_data = np.loadtxt("avg_cov_img_" + str(MASK) + ".txt")
 loaded_avg = loaded_data[:3]
 loaded_cov = loaded_data[3:].reshape(3, 3)
 
@@ -71,9 +74,8 @@ mahalanobis_distance_image = np.reshape(mahalanobis_dist, (img.shape[0], img.sha
 
 # Scale the distance image and export it.
 mahalanobis_distance_image_scaled = 255 * mahalanobis_distance_image / np.max(mahalanobis_distance_image)
-cv2.imshow("Mahalanobis Distance Image", mahalanobis_distance_image)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+
+# Saving the mahalanobis distance image and the scaled mahalanobis distance image.
 cv2.imwrite("Pics out/mahalanobis_dist_image.jpg", mahalanobis_distance_image)
 cv2.imwrite("Pics out/mahalanobis_dist_image_scaled.jpg", mahalanobis_distance_image_scaled)
 
@@ -88,10 +90,7 @@ imgCanny = cv2.Canny(imgfeGray, tLower, tUpper)
 contours, hierarchy = cv2.findContours(imgCanny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 cv2.drawContours(img_maha_scaled, contours, -1, (0, 255, 0), 2)
 
-cv2.imshow("Contour Image", img_maha_scaled)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-with open(folder + "img_" + str(i) + ".txt", 'w') as f:
+with open(folder + "img_" + str(image_number) + ".txt", 'w') as f:
     for contour in contours:
         # Calculate circularity
         area = cv2.contourArea(contour)
@@ -99,7 +98,7 @@ with open(folder + "img_" + str(i) + ".txt", 'w') as f:
         if perimeter > 0: circularity = (4 * np.pi * area) / (perimeter ** 2)
         print("Circularity:", circularity)
     
-        if circularity > 0.8:
+        if circularity > 0.75 and area > 80:
             # Calculate moments for contour
             moments = cv2.moments(contour)
 
@@ -114,7 +113,10 @@ with open(folder + "img_" + str(i) + ".txt", 'w') as f:
 
                 # Calculate Hu Moments
                 hu_moments = cv2.HuMoments(moments)
-                print("Hu Moments:", hu_moments.flatten())
+                f.write(f"Contour:\n") 
+                f.write(f"Area: {area}\n") 
+                f.write(f"Perimeter: {perimeter}\n") 
+                f.write(f"Hu Moments: {hu_moments}\n") 
     
 
 
